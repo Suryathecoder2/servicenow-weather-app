@@ -1,0 +1,45 @@
+<g:ui_form>
+  <div style="padding: 20px;">
+    <h2>Get Weather Info</h2>
+    <label for="cityInput">Enter City:</label>
+    <input type="text" id="cityInput" />
+    <br /><br />
+    <button onclick="getWeather()">Get Weather</button>
+    <br /><br />
+    <div id="weatherResult" style="font-weight: bold;"></div>
+  </div>
+
+  <script type="text/javascript">
+    function getWeather() {
+      var city = document.getElementById("cityInput").value;
+      if (!city) {
+        alert("Please enter a city name.");
+        return;
+      }
+
+      var ga = new GlideAjax('WeatherIntegration');
+      ga.addParam('sysparm_name', 'getWeather');
+      ga.addParam('city', city);
+      ga.getXMLAnswer(function(response) {
+        if (!response) {
+          document.getElementById("weatherResult").innerHTML = "⚠️ No response from server.";
+          return;
+        }
+
+        try {
+          var data = JSON.parse(response);
+
+          if (data.error) {
+            document.getElementById("weatherResult").innerHTML = "⚠️ Error: " + data.error;
+          } else {
+            document.getElementById("weatherResult").innerHTML =
+              "🌡 Temperature: " + data.temp + "°C<br />" +
+              "⛅ Condition: " + data.condition;
+          }
+        } catch (e) {
+          document.getElementById("weatherResult").innerHTML = "⚠️ Failed to parse server response.";
+        }
+      });
+    }
+  </script>
+</g:ui_form>
